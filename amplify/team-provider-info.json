@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-bitfront-dev-200741-authRole",
+      "UnauthRoleArn": "arn:aws:iam::788539785978:role/amplify-bitfront-dev-200741-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::788539785978:role/amplify-bitfront-dev-200741-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-bitfront-dev-200741-deployment",
+      "UnauthRoleName": "amplify-bitfront-dev-200741-unauthRole",
+      "StackName": "amplify-bitfront-dev-200741",
+      "StackId": "arn:aws:cloudformation:us-east-1:788539785978:stack/amplify-bitfront-dev-200741/83c42290-e74d-11ec-b6fc-0ea740ae7b99",
+      "AmplifyAppId": "dch740lihumg8"
+    }
+  }
+}
