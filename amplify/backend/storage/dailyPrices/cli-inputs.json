@@ -1,0 +1,10 @@
+{
+  "resourceName": "dailyPrices",
+  "tableName": "dailyPrices",
+  "partitionKey": {
+    "fieldName": "date",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

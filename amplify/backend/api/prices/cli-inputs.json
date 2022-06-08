@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "paths": {
+    "/dailyPrices/{date}": {
+      "name": "/dailyPrices/{date}",
+      "lambdaFunction": "dailyPrices",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}

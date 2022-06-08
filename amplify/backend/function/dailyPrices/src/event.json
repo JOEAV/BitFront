@@ -1,0 +1,11 @@
+{
+  "httpMethod": "GET",
+  "path": "/dailyPrices",
+  "queryStringParameters": {
+    "limit": "10"
+  },
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": ""
+}
