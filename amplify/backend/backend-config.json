@@ -6,25 +6,6 @@
     }
   },
   "function": {
-    "dailyPrices": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "storage",
-          "resourceName": "dailyPrices",
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
-          "attributeEnvMap": {
-            "Name": "TABLE_NAME",
-            "Arn": "TABLE_ARN"
-          }
-        }
-      ]
-    },
     "handlePrices": {
       "build": true,
       "providerPlugin": "awscloudformation",

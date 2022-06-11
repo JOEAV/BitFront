@@ -13,10 +13,6 @@
     },
     "categories": {
       "function": {
-        "dailyPrices": {
-          "deploymentBucketName": "amplify-bitfront-dev-200741-deployment",
-          "s3Key": "amplify-builds/dailyPrices-394e385a76526a495441-build.zip"
-        },
         "handlePrices": {
           "deploymentBucketName": "amplify-bitfront-dev-200741-deployment",
           "s3Key": "amplify-builds/handlePrices-376f41395857746e3346-build.zip"
