@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios,{ AxiosError, AxiosResponse } from 'axios';
 import { RootState, AppThunk } from '../../app/store';
 import { getAllPrices,getFavPrices,getPriceByDate,setDateFavorite,unsetDateFavorite,PriceItem } from '../../api/api'
-
+import dayjs from 'dayjs'
 export interface AppState{
     value:{
         viewedDates:PriceItem[] | [],
@@ -26,7 +26,12 @@ export const getPriceByDateAsync = createAsyncThunk(
   'app/getPriceByDate',
   async ({dateAsDay}:{dateAsDay:string},thunkAPI) => {
     try{
-      const response = await getPriceByDate({dateAsDay})
+      let response = await getPriceByDate({dateAsDay})
+      //that means the price date for today has not been stored in external marketAPI
+
+      if(!response.data.date){
+        response= await getPriceByDate({dateAsDay:dayjs().subtract(1,'day').format('YYYY-MM-DD')})
+      }
       console.log(response)
       return response
     }catch(err){

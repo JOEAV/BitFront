@@ -19,7 +19,7 @@
         },
         "updatePricesDaily": {
           "deploymentBucketName": "amplify-bitfront-dev-200741-deployment",
-          "s3Key": "amplify-builds/updatePricesDaily-5076703853386d4d7250-build.zip"
+          "s3Key": "amplify-builds/updatePricesDaily-48654a2b477a42574b41-build.zip"
         }
       }
     }

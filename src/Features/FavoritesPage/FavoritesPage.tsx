@@ -3,14 +3,28 @@ import { HeaderResponsive } from "../../Components/HeaderResponsive";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "../../app/hooks";
-import {getFavPricesAsync, selectFavDates} from '../HomePage/appSlice';
+import {getFavPricesAsync, getPriceByDateAsync, selectCachedViewedDates, selectFavDates} from '../HomePage/appSlice';
 import { LineGraph } from "../../Components/Graph";
 import { PriceItem } from "../../api/api";
+import dayjs from 'dayjs'
+const PRICE_ITEM_DATE_KEY_FORMAT = 'YYYY-MM-DD'
+
+const formatDayObjectAsDbKey = (date:Date|null) => dayjs(date).format(PRICE_ITEM_DATE_KEY_FORMAT).toString()
+const nullable_item:PriceItem ={
+    open:0,close:0,high:0,low:0,fav:false,date:'',ilsUsdRatio:0
+  }
 export default function FavoritesPage() {
   const dispatch = useAppDispatch()
   const [pickedDate, onPickedDateChanged] = useState<string|null>('');
   const favDates = useSelector(selectFavDates)
-
+  const viewedDates = useSelector(selectCachedViewedDates)
+  const todayDateString = formatDayObjectAsDbKey(dayjs().toDate())
+  const yesterdayDateString = formatDayObjectAsDbKey(dayjs().subtract(1,'day').toDate())
+  //comparing with yesterday if the external marketAPI (which runs on UTC) still
+//didn't updated todays (Local GMT+2) price item
+const todaysPriceItem =  viewedDates.find(val=>val.date === todayDateString) ||
+viewedDates.find(val=>val.date === yesterdayDateString)
+|| nullable_item
   const pickedDayChartData = ()=>{
     const favDate:PriceItem|undefined = favDates.find(val=>val.date === pickedDate)
     return favDate ? {
@@ -28,6 +42,11 @@ export default function FavoritesPage() {
       dispatch(getFavPricesAsync())
     }
   },[favDates])
+  useEffect(()=>{
+    if(todaysPriceItem === nullable_item){
+      dispatch(getPriceByDateAsync({dateAsDay:todayDateString}))
+    }
+  },[])
   return (
     <>
     <HeaderResponsive pageName="favorites"
@@ -42,7 +61,7 @@ export default function FavoritesPage() {
          <Title order={4}
        sx={(theme) => ({
         color: theme.colors.orange[4],
-       })}>It's that simple'</Title>
+       })}>It's that simple</Title>
          </Center>
 
        <Center mt={20}>
@@ -50,7 +69,7 @@ export default function FavoritesPage() {
        </Center>
        
            <Container>
-       <LineGraph  onRemoveFavCalled={()=>onPickedDateChanged('')} dailyPriceData={pickedDayChartData()}></LineGraph>
+       <LineGraph todayPriceData={todaysPriceItem} onRemoveFavCalled={()=>onPickedDateChanged('')} dailyPriceData={pickedDayChartData()}></LineGraph>
        </Container>
        
        

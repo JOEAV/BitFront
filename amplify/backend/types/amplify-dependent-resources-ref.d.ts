@@ -10,12 +10,6 @@ export type AmplifyDependentResourcesAttributes = {
         }
     },
     "function": {
-        "dailyPrices": {
-            "Name": "string",
-            "Arn": "string",
-            "Region": "string",
-            "LambdaExecutionRole": "string"
-        },
         "handlePrices": {
             "Name": "string",
             "Arn": "string",

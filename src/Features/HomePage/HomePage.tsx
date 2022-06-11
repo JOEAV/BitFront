@@ -12,6 +12,9 @@ import { PriceItem } from "../../api/api";
 const PRICE_ITEM_DATE_KEY_FORMAT = 'YYYY-MM-DD'
 const formatDayObjectAsDbKey = (date:Date|null) => dayjs(date).format(PRICE_ITEM_DATE_KEY_FORMAT).toString()
 export default function HomePage() {
+  const nullable_item:PriceItem ={
+    open:0,close:0,high:0,low:0,fav:false,date:'',ilsUsdRatio:0
+  }
   const FIRST_AVAILABLE_DATE:string = '2019-09-16'
   const isMobile = useMediaQuery('(max-width: 755px)');
   const dispatch = useAppDispatch()
@@ -19,6 +22,13 @@ export default function HomePage() {
   const pickedDateFormatted =formatDayObjectAsDbKey(pickedDate)
   const favDates = useSelector(selectFavDates)
   const viewedDates = useSelector(selectCachedViewedDates)
+  const todayDateString = formatDayObjectAsDbKey(dayjs().toDate())
+  const yesterdayDateString = formatDayObjectAsDbKey(dayjs().subtract(1,'day').toDate())
+//comparing with yesterday if the external marketAPI (which runs on UTC) still
+//didn't updated todays (Local GMT+2) price item
+  const todaysPriceItem =  viewedDates.find(val=>val.date === todayDateString) ||
+  viewedDates.find(val=>val.date === yesterdayDateString)
+  || nullable_item
   const pickedDayChartData = ()=>{
     const cachedDate:PriceItem|undefined = viewedDates.find(val=>val.date === pickedDateFormatted)
     return cachedDate ? {
@@ -29,11 +39,16 @@ export default function HomePage() {
       date:cachedDate.date,
       ilsUsdRatio:cachedDate.ilsUsdRatio,
       fav: cachedDate.fav
-    }as PriceItem: {open:0,close:0,high:0,low:0,fav:false,date:'',ilsUsdRatio:0} as PriceItem
+    }as PriceItem: nullable_item
   }
   useEffect( ()=>{
     if(favDates.length === 0){
       dispatch(getFavPricesAsync())
+    }
+  },[])
+  useEffect(()=>{
+    if(todaysPriceItem === nullable_item){
+      dispatch(getPriceByDateAsync({dateAsDay:todayDateString}))
     }
   },[])
   return (
@@ -62,7 +77,7 @@ export default function HomePage() {
        </Center>
        {/* <Text>{pickedDateFormatted}</Text> */}
        <Container mt={20}>
-       <LineGraph dailyPriceData={pickedDayChartData()}></LineGraph>
+       <LineGraph todayPriceData={(todaysPriceItem as PriceItem)} dailyPriceData={pickedDayChartData()}></LineGraph>
        </Container>
       </Container>
     </main>

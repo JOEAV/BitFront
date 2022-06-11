@@ -72,10 +72,12 @@ const USD ='usd'
 const ILS = 'ils'
 interface LineGraphProps{
 dailyPriceData: PriceItem,
+todayPriceData: PriceItem,
 onRemoveFavCalled?: ()=>void
 }
 export function LineGraph({
   dailyPriceData,
+  todayPriceData,
   onRemoveFavCalled
 }:LineGraphProps) {
     const dispatch = useAppDispatch()
@@ -84,35 +86,38 @@ export function LineGraph({
   const favDates = useSelector(selectFavDates)
   const isCurrentDateFav = favDates.find(favDates=>favDates.date === dailyPriceData.date) && true
   const labels: string[] = ["open", "low", "high", "close"];
-  const getPricesAtCurrency = () => {
+  const getPricesAtCurrency = (priceItemObject:PriceItem) => {
     const numbersData: number[] = [
-        dailyPriceData.open as number,
-        dailyPriceData.low as number,
-        dailyPriceData.high as number,
-        dailyPriceData.close as number,
+        priceItemObject.open as number,
+        priceItemObject.low as number,
+        priceItemObject.high as number,
+        priceItemObject.close as number,
       ];
     return selectedCurrency === ILS ?
      numbersData :
-     numbersData.map(ilsVal=>ilsVal/(dailyPriceData.ilsUsdRatio as number))
+     numbersData.map(ilsVal=>ilsVal/(priceItemObject.ilsUsdRatio as number))
   }
-  const numbersData: number[] = [
-    dailyPriceData.open as number,
-    dailyPriceData.low as number,
-    dailyPriceData.high as number,
-    dailyPriceData.close as number,
-  ];
+
   const dataIsValid = dailyPriceData.open !== 0;
   const data: ChartData<"line"> = {
     labels,
     datasets: [
       {
         label: `${dailyPriceData.date}`,
-        data:getPricesAtCurrency(),
+        data:getPricesAtCurrency(dailyPriceData),
         borderColor: "#ffa94d",
         backgroundColor: "#ffb95d",
       },
+      {
+          label: `today (${todayPriceData.date})`,
+          data:getPricesAtCurrency(todayPriceData),
+          borderColor: 'rgb(53, 162, 235)',
+          backgroundColor: 'rgba(53, 162, 235, 0.5)',
+
+      }
     ],
   };
+  
 
   return (
     <>
@@ -173,7 +178,7 @@ export function LineGraph({
             </Center>
             <Center>
             <Text p={"md"} sx={{ whiteSpace: "pre-line" }}>
-              Your Graph will be ready soon
+              Your graph will be ready soon
             </Text>
             </Center>
             
@@ -184,7 +189,7 @@ export function LineGraph({
           <Container>
           <Center>
         <Text size="lg" weight={"700"}>
-          Please Pick a date to see the relevant prices
+          Please pick a date to see the relevant prices
         </Text>
         </Center>
         </Container>
