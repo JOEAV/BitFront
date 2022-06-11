@@ -5,15 +5,21 @@ Licensed under the Apache License, Version 2.0 (the "License"). You may not use 
 or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and limitations under the License.
 */
+import { DynamoDB } from "@aws-sdk/client-dynamodb";
+import pkg from "@aws-sdk/config-resolver";
 
-import { config, DynamoDB } from "aws-sdk";
-import { eventContext } from "aws-serverless-express/middleware";
-import { json } from "body-parser";
+import serverless from "@vendia/serverless-express";
+
+// import { eventContext } from "aws-serverless-express/middleware";
+import json from "body-parser";
 import express from "express";
+const { config } = pkg;
+const { eventContext } = serverless;
+debugger;
+// config.update({ region: process.env.TABLE_REGION });
 
-config.update({ region: process.env.TABLE_REGION });
-
-const dynamodb = new DynamoDB.DocumentClient();
+const client = new DynamoDB({})
+// const dynamodb = new DynamoDBDocumentClient.from(client)
 
 let tableName = "dailyPrices";
 if (process.env.ENV && process.env.ENV !== "NONE") {
@@ -62,7 +68,6 @@ app.get(path + hashKeyPath, function (req, res) {
   condition[partitionKeyName] = {
     ComparisonOperator: "EQ",
   };
-
   if (userIdPresent && req.apiGateway) {
     condition[partitionKeyName]["AttributeValueList"] = [
       req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH,
@@ -70,19 +75,28 @@ app.get(path + hashKeyPath, function (req, res) {
   } else {
     try {
       condition[partitionKeyName]["AttributeValueList"] = [
-        convertUrlType(req.params[partitionKeyName], partitionKeyType),
+        convertUrlType(requestedPriceDates, partitionKeyType),
       ];
     } catch (err) {
       res.statusCode = 500;
       res.json({ error: "Wrong column type " + err });
     }
   }
-
-  let queryParams = {
+  const shouldReturnAllItems = requestedPriceDates=== 'all'
+  let queryParams = !shouldReturnAllItems ? {
     TableName: tableName,
     KeyConditions: condition,
-  };
-
+  } : {TableName:tableName} 
+  if(shouldReturnAllItems){
+    dynamodb.scan(queryParams,(err,data)=>{
+      if (err) {
+        res.statusCode = 500;
+        res.json({ error: "Could not load items: " + err });
+      } else {
+        res.json(data.Items);
+      }
+    })
+  }
   dynamodb.query(queryParams, (err, data) => {
     if (err) {
       res.statusCode = 500;

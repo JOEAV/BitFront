@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "storage": {
+      "dailyPrices": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    },
+    "api": {
+      "btcApi": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    }
+  },
+  "lambdaLayers": []
+}

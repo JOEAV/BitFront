@@ -1,5 +1,5 @@
 import { createServer, proxy } from 'aws-serverless-express';
-import app from './app';
+import app from './app.js';
 
 /**
  * @type {import('http').Server}

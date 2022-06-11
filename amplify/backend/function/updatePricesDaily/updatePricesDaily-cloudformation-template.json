@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Lambda Function resource stack creation using Amplify CLI",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"8.4.0\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",
@@ -16,6 +16,14 @@
     "s3Key": {
       "Type": "String"
     },
+    "apibtcApiApiName": {
+      "Type": "String",
+      "Default": "apibtcApiApiName"
+    },
+    "apibtcApiApiId": {
+      "Type": "String",
+      "Default": "apibtcApiApiId"
+    },
     "storagedailyPricesName": {
       "Type": "String",
       "Default": "storagedailyPricesName"
@@ -23,6 +31,10 @@
     "storagedailyPricesArn": {
       "Type": "String",
       "Default": "storagedailyPricesArn"
+    },
+    "storagedailyPricesStreamArn": {
+      "Type": "String",
+      "Default": "storagedailyPricesStreamArn"
     }
   },
   "Conditions": {
@@ -55,12 +67,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "dailyPrices",
+            "updatePricesDaily",
             {
               "Fn::Join": [
                 "",
                 [
-                  "dailyPrices",
+                  "updatePricesDaily",
                   "-",
                   {
                     "Ref": "env"
@@ -77,6 +89,21 @@
             },
             "REGION": {
               "Ref": "AWS::Region"
+            },
+            "API_BTCAPI_APINAME": {
+              "Ref": "apibtcApiApiName"
+            },
+            "API_BTCAPI_APIID": {
+              "Ref": "apibtcApiApiId"
+            },
+            "STORAGE_DAILYPRICES_NAME": {
+              "Ref": "storagedailyPricesName"
+            },
+            "STORAGE_DAILYPRICES_ARN": {
+              "Ref": "storagedailyPricesArn"
+            },
+            "STORAGE_DAILYPRICES_STREAMARN": {
+              "Ref": "storagedailyPricesStreamArn"
             }
           }
         },
@@ -97,12 +124,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "bitfrontLambdaRole38f30cb4",
+            "bitfrontLambdaRole0597e80d",
             {
               "Fn::Join": [
                 "",
                 [
-                  "bitfrontLambdaRole38f30cb4",
+                  "bitfrontLambdaRole0597e80d",
                   "-",
                   {
                     "Ref": "env"
@@ -168,17 +195,41 @@
                   }
                 ]
               }
-            },
+            }
+          ]
+        }
+      }
+    },
+    "AmplifyResourcesPolicy": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
             {
               "Effect": "Allow",
               "Action": [
-                "dynamodb:DescribeTable",
-                "dynamodb:GetItem",
-                "dynamodb:Query",
+                "dynamodb:Put*",
+                "dynamodb:Create*",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:Get*",
+                "dynamodb:BatchGetItem",
+                "dynamodb:List*",
+                "dynamodb:Describe*",
                 "dynamodb:Scan",
-                "dynamodb:PutItem",
-                "dynamodb:UpdateItem",
-                "dynamodb:DeleteItem"
+                "dynamodb:Query",
+                "dynamodb:Update*",
+                "dynamodb:RestoreTable*",
+                "dynamodb:Delete*"
               ],
               "Resource": [
                 {
@@ -196,7 +247,76 @@
                   ]
                 }
               ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "apigateway:POST",
+                "apigateway:PUT",
+                "apigateway:GET",
+                "apigateway:HEAD",
+                "apigateway:OPTIONS",
+                "apigateway:PATCH",
+                "apigateway:DELETE"
+              ],
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      "::/restapis/",
+                      {
+                        "Ref": "apibtcApiApiName"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              ]
             }
+          ]
+        }
+      }
+    },
+    "CloudWatchEvent": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "Description": "Schedule rule for Lambda",
+        "ScheduleExpression": {
+          "Ref": "CloudWatchRule"
+        },
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "LambdaFunction",
+                "Arn"
+              ]
+            },
+            "Id": {
+              "Ref": "LambdaFunction"
+            }
+          }
+        ]
+      }
+    },
+    "PermissionForEventsToInvokeLambda": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "LambdaFunction"
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "CloudWatchEvent",
+            "Arn"
           ]
         }
       }
@@ -224,6 +344,11 @@
     "LambdaExecutionRole": {
       "Value": {
         "Ref": "LambdaExecutionRole"
+      }
+    },
+    "CloudWatchEventRule": {
+      "Value": {
+        "Ref": "CloudWatchEvent"
       }
     }
   }

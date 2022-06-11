@@ -10,6 +10,22 @@
       "StackName": "amplify-bitfront-dev-200741",
       "StackId": "arn:aws:cloudformation:us-east-1:788539785978:stack/amplify-bitfront-dev-200741/83c42290-e74d-11ec-b6fc-0ea740ae7b99",
       "AmplifyAppId": "dch740lihumg8"
+    },
+    "categories": {
+      "function": {
+        "dailyPrices": {
+          "deploymentBucketName": "amplify-bitfront-dev-200741-deployment",
+          "s3Key": "amplify-builds/dailyPrices-394e385a76526a495441-build.zip"
+        },
+        "handlePrices": {
+          "deploymentBucketName": "amplify-bitfront-dev-200741-deployment",
+          "s3Key": "amplify-builds/handlePrices-376f41395857746e3346-build.zip"
+        },
+        "updatePricesDaily": {
+          "deploymentBucketName": "amplify-bitfront-dev-200741-deployment",
+          "s3Key": "amplify-builds/updatePricesDaily-5076703853386d4d7250-build.zip"
+        }
+      }
     }
   }
 }
