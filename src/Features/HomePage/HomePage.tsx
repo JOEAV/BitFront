@@ -6,7 +6,7 @@ import { Dayjs, default as dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "../../app/hooks";
-import {getPriceByDateAsync,getFavPricesAsync,selectCachedViewedDates} from './appSlice';
+import {getPriceByDateAsync,getFavPricesAsync,selectCachedViewedDates, selectFavDates} from './appSlice';
 import { LineGraph } from "../../Components/Graph";
 import { PriceItem } from "../../api/api";
 const PRICE_ITEM_DATE_KEY_FORMAT = 'YYYY-MM-DD'
@@ -17,6 +17,7 @@ export default function HomePage() {
   const dispatch = useAppDispatch()
   const [pickedDate, onPickedDateChanged] = useState<Date|null>(null);
   const pickedDateFormatted =formatDayObjectAsDbKey(pickedDate)
+  const favDates = useSelector(selectFavDates)
   const viewedDates = useSelector(selectCachedViewedDates)
   const pickedDayChartData = ()=>{
     const cachedDate:PriceItem|undefined = viewedDates.find(val=>val.date === pickedDateFormatted)
@@ -31,15 +32,13 @@ export default function HomePage() {
     }as PriceItem: {open:0,close:0,high:0,low:0,fav:false,date:'',ilsUsdRatio:0} as PriceItem
   }
   useEffect( ()=>{
-    dispatch(getFavPricesAsync())
+    if(favDates.length === 0){
+      dispatch(getFavPricesAsync())
+    }
   },[])
   return (
     <>
-    <HeaderResponsive
-      links={[
-        { label: "home", link: "#home" },
-        { label: "favorites", link: "#favs" },
-      ]}
+    <HeaderResponsive pageName="home"
     />
     <main>
       <Container>

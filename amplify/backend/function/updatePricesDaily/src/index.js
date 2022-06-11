@@ -17,7 +17,7 @@ Amplify Params - DO NOT EDIT */
  let tableName = "dailyPrices";
 
  const dynamodb = new AWS.DynamoDB.DocumentClient();
- debugger;
+
  if (process.env.ENV && process.env.ENV !== "NONE") {
     tableName = tableName + "-" + process.env.ENV;
   }else{
@@ -109,8 +109,6 @@ return transformedPricesObj
     try {
       const rawData = await getBTCPrices({origin:'marketAPI'});
       const filteredData = extractRelevantPriceData(rawData)
-      console.log('filtered',filteredData)
-      console.log('result is: 👉️', rawData);
       const currentDbState = await getBTCPrices({origin:'db'}) 
       //finding the differnce between db and marketAPI result
       const currentDbDaysKeys = currentDbState.map((val,index)=>currentDbState[index].date)

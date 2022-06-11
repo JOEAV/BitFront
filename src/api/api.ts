@@ -34,7 +34,6 @@ export async function getFavPrices() {
   }
 
   export async function setDateFavorite({dailyPriceItem}:{dailyPriceItem:PriceItem}) { 
-    debugger;
     const itemAsFavorite = {...dailyPriceItem,...{fav:true}}
     return  axios.put( `https://ab17h4imt5.execute-api.us-east-1.amazonaws.com/dev/dailyPrices`,itemAsFavorite)
   }

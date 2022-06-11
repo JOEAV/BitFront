@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { createStyles, Header, Container, Group, Burger, Paper, Transition,Text,Title } from '@mantine/core';
+import { createStyles, Header, Container, Group, Burger, Paper, Transition,Text,Title, Button } from '@mantine/core';
 import { useBooleanToggle } from '@mantine/hooks';
 import BtcLogo from './BtcLogo'
+import { Link } from 'react-router-dom';
 
 const HEADER_HEIGHT = 60;
 
@@ -53,7 +54,7 @@ const useStyles = createStyles((theme) => ({
     borderRadius: theme.radius.sm,
     textDecoration: 'none',
     color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.colors.gray[7],
-    fontSize: theme.fontSizes.sm,
+    // fontSize: theme.fontSizes.sm,
     fontWeight: 500,
 
     '&:hover': {
@@ -62,7 +63,7 @@ const useStyles = createStyles((theme) => ({
 
     [theme.fn.smallerThan('sm')]: {
       borderRadius: 0,
-      padding: theme.spacing.md,
+      padding: theme.spacing.sm,
     },
   },
 
@@ -81,26 +82,42 @@ interface HeaderResponsiveProps {
   links: { link: string; label: string }[];
 }
 
-export function HeaderResponsive({ links }: HeaderResponsiveProps) {
-  const [active, setActive] = useState(links[0].link);
+export function HeaderResponsive( {pageName }:{pageName: string}) {
+  const [active, setActive] = useState(pageName);
   const [opened, toggleOpened] = useBooleanToggle(false);
   const { classes, cx } = useStyles();
 
-  const items = links.map((link) => (
-    <a
-      key={link.label}
-      href={link.link}
-      className={cx(classes.link, { [classes.linkActive]: active === link.link })}
-      onClick={(event) => {
-        event.preventDefault();
-        setActive(link.link);
-        toggleOpened(false);
-      }}
-    >
-      {link.label}
-    </a>
-  ));
-
+  // const items = links.map((link) => (
+  //   <a
+  //     key={link.label}
+  //     href={link.link}
+  //     className={cx(classes.link, { [classes.linkActive]: active === link.link })}
+  //     onClick={(event) => {
+  //       event.preventDefault();
+  //       setActive(link.link);
+  //       toggleOpened(false);
+  //     }}
+  //   >
+  //     {link.label}
+  //   </a>
+  // ));
+const items=['home','favorites'].map((link)=>(
+  <Button
+  key={link}
+  variant={"light"}
+  color={link===active ? 'blue' : 'gray'}
+  className={cx(classes.link, { [classes.linkActive]: link === active })}
+  component={Link} to={`/${link}`}
+  onClick={(event:any) => {
+    setActive(link);
+    toggleOpened(false);
+          
+       
+        }}
+  >
+  {link}
+  </Button>
+))
   return (
     <Header height={HEADER_HEIGHT} mb={120} className={classes.root}>
       <Container className={classes.header}>

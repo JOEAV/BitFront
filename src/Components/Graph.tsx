@@ -70,11 +70,14 @@ const options: ChartOptions = {
 
 const USD ='usd'
 const ILS = 'ils'
+interface LineGraphProps{
+dailyPriceData: PriceItem,
+onRemoveFavCalled?: ()=>void
+}
 export function LineGraph({
   dailyPriceData,
-}: {
-  dailyPriceData: PriceItem;
-}) {
+  onRemoveFavCalled
+}:LineGraphProps) {
     const dispatch = useAppDispatch()
   const isAppLoading = useSelector(selectIsLoading);
   const [selectedCurrency, setSelectedCurrency] = useState("ils");
@@ -148,6 +151,9 @@ export function LineGraph({
               onClick={async ()=>{
                   if(isCurrentDateFav){
                       await dispatch(unsetDateFavoriteAsync({dailyPriceItem:dailyPriceData}))
+                      if(onRemoveFavCalled){
+                        onRemoveFavCalled()
+                      }
                   }else{
                     await dispatch(setDateFavoriteAsync({dailyPriceItem:dailyPriceData}))
                   }
@@ -157,19 +163,31 @@ export function LineGraph({
             </Button>
         </Stack>
       ) : isAppLoading ? (
-        <Center>
+        
           <Container size="md">
+            <Center>
             <Loader mt={10} size="xl" variant="bars" />;
+            </Center>
+            <Center>
             <MantineTitle order={1}>Loading...</MantineTitle>
+            </Center>
+            <Center>
             <Text p={"md"} sx={{ whiteSpace: "pre-line" }}>
               Your Graph will be ready soon
             </Text>
+            </Center>
+            
+            
           </Container>
-        </Center>
+        
       ) : (
+          <Container>
+          <Center>
         <Text size="lg" weight={"700"}>
           Please Pick a date to see the relevant prices
         </Text>
+        </Center>
+        </Container>
       )}
     </>
   );

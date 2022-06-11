@@ -54,7 +54,6 @@ export const getPriceByDateAsync = createAsyncThunk(
     'app/setDateFavorite',
     async ({dailyPriceItem}:{dailyPriceItem:PriceItem},thunkAPI) => {
       try{
-        debugger
         const response = await setDateFavorite({dailyPriceItem})
         console.log(response)
         return dailyPriceItem
@@ -96,9 +95,7 @@ export const appSlice = createSlice({
 
       })
       .addCase(getPriceByDateAsync.fulfilled, (state,{payload}) => {
-        debugger
         if(payload&&payload.data){
-          debugger
           const data:PriceItem = payload.data
           // if(!state.value.viewedDates.slice(0).includes(data))
           state.value.viewedDates = [...state.value.viewedDates,data]
